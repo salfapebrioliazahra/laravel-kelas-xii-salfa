@@ -38,7 +38,7 @@
           <div class="single-right-grids">
 
             <div class="col-md-4 single-right-grid-left">
-              <a href="{{ route('movies.show', $film->id) }}"><img src="/{{ $film->poster }}" alt="" /></a>
+              <a href="{{ route('movies.show', $film->id) }}"><img src="{{ asset($film->poster) }}" alt="" /></a>
             </div>
             <div class="col-md-8 single-right-grid-right">
               <div class="song-info">
@@ -59,7 +59,7 @@
                       <tbody>
                         @foreach ($perans as $peran)
                         <tr>
-                          <td class="w3-list-info">{{ $peran->cast_id }}</td>
+                          <td class="w3-list-info">{{ $peran->cast->name ?? '-' }}</td>
                           <td class="w3-list-info">{{ $peran->actor }}</td>
                         </tr>
                         @endforeach
@@ -114,24 +114,59 @@
           </div>
         </div>
         <div class="clearfix"> </div>
-        <div class="all-comments">
+        <div class="all-comments" id="comments-section">
           <div class="all-comments-info">
-            <a href="#">Comments</a>
+            <a href="#comments-section">Comments</a>
             <div class="agile-info-wthree-box">
-              <form>
-                <input type="text" placeholder="Name" required="">			           					   
-                <input type="text" placeholder="Email" required="">
-                <input type="text" placeholder="Phone" required="">
-                <textarea placeholder="Message" required=""></textarea>
-                <input type="submit" value="SEND">
-                <div class="clearfix"> </div>
-              </form>
+
+              {{-- Flash pesan sukses --}}
+              @if (session('success_comment'))
+                <div style="background: #dff0d8; border: 1px solid #3c763d; color: #3c763d; padding: 10px 15px; margin-bottom: 15px; border-radius: 3px;">
+                  <strong>&#10003;</strong> {{ session('success_comment') }}
+                </div>
+              @endif
+
+              @auth
+                @if ($errors->any())
+                  <div style="background: #f2dede; border: 1px solid #a94442; color: #a94442; padding: 10px 15px; margin-bottom: 15px; border-radius: 3px;">
+                    <ul style="margin: 0; padding-left: 18px;">
+                      @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                      @endforeach
+                    </ul>
+                  </div>
+                @endif
+                <form action="{{ route('comments.store', $film->id) }}" method="POST">
+                  @csrf
+                  <textarea name="comment" placeholder="Tulis komentar Anda..." required>{{ old('comment') }}</textarea>
+                  <select name="rating" required style="display: block; width: 100%; padding: 10px 15px; margin: 0 0 20px; border: 1px solid #d9d9d9; box-sizing: border-box; font-size: 14px; background: #fff;">
+                    <option value="">-- Pilih Rating (1-5) --</option>
+                    @for ($i = 1; $i <= 5; $i++)
+                      <option value="{{ $i }}" {{ old('rating') == $i ? 'selected' : '' }}>
+                        {{ $i }} Bintang {{ str_repeat('★', $i) }}
+                      </option>
+                    @endfor
+                  </select>
+                  <input type="submit" value="SEND">
+                  <div class="clearfix"> </div>
+                </form>
+              @else
+                <div style="text-align: center; padding: 20px 10px; color: #666;">
+                  <p style="margin-bottom: 15px; font-size: 14px;">Silakan login terlebih dahulu untuk memberikan komentar.</p>
+                  <a href="#" data-toggle="modal" data-target="#myModal"
+                     style="display: inline-block; background: #FF8D1B; color: #fff; padding: 8px 25px; text-decoration: none; text-transform: uppercase; font-weight: bold; font-size: 13px; transition: .5s ease-in;"
+                     onmouseover="this.style.background='#212121'" onmouseout="this.style.background='#FF8D1B'">
+                    Login untuk Berkomentar
+                  </a>
+                </div>
+              @endauth
+
             </div>
           </div>
           <div class="media-grids">
             @foreach ($comments as $comment)
               <div class="media">
-                <h5>{{ $comment->user_id }}</h5>
+                <h5>{{ $comment->user->name ?? 'Pengguna' }}</h5>
                 <div class="media-left">
                   <a href="#">
                     <img src="{{ asset('storage/images/user.jpg') }}" title="One movies" alt=" " />
@@ -151,7 +186,7 @@
           <div class="single-grid-right">
             <div class="single-right-grids">
               <div class="col-md-4 single-right-grid-left">
-                <a href="{{ route('movies.show', $film->id) }}"><img src="/{{ $film->poster }}" alt="" /></a>
+                <a href="{{ route('movies.show', $film->id) }}"><img src="{{ asset($film->poster) }}" alt="" /></a>
               </div>
               <div class="col-md-8 single-right-grid-right">
                 <a href="{{ route('movies.show', $film->id) }}" class="title">{{ $film->title }}</a>
@@ -172,7 +207,7 @@
         @foreach ($filmByRelease as $filmRelease)
           <div class="item">
             <div class="w3l-movie-gride-agile w3l-movie-gride-agile1">
-              <a href="{{ route('movies.show', $filmRelease->id) }}" class="hvr-shutter-out-horizontal"><img src="/{{ $filmRelease->poster }}" title="{{ $filmRelease->title }}" class="img-responsive" alt=" " />
+              <a href="{{ route('movies.show', $filmRelease->id) }}" class="hvr-shutter-out-horizontal"><img src="{{ asset($filmRelease->poster) }}" title="{{ $filmRelease->title }}" class="img-responsive" alt=" " />
                 <div class="w3l-action-icon"><i class="fa fa-play-circle" aria-hidden="true"></i></div>
               </a>
               <div class="mid-1 agileits_w3layouts_mid_1_home">

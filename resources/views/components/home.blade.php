@@ -11,7 +11,7 @@
 <div id="slidey" style="display:none;">
   <ul>
     @foreach ($filmSlidey as $film)
-      <li><img src="{{ $film->poster }}" alt="{{ $film->title }}">
+      <li><img src="{{ asset($film->poster) }}" alt="{{ $film->title }}">
         <p class='title'>{{ $film->title }}</p>
         <p class='description'>{{ $film->sinopsis }}</p>
       </li>
